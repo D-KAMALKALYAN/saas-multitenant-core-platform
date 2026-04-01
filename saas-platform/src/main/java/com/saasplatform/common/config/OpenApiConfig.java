@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
                 title = "SaaS Platform API",
                 version = "1.0.0",
                 description = "Multi-Tenant SaaS Infrastructure Platform"
-        ),
-        security = @SecurityRequirement(name = "bearerAuth")
+        )
+//        security = @SecurityRequirement(name = "bearerAuth")
 )
 
 @SecurityScheme(
