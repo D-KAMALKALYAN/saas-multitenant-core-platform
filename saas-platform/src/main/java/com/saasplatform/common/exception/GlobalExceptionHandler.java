@@ -47,9 +47,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<StandardApiResponse<Void>> handleGenericException(Exception ex){
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(StandardApiResponse.failure(ex.getMessage()));
+                .body(StandardApiResponse.failure("An unexpected error occurred. Please try again."));
     }
 
 
