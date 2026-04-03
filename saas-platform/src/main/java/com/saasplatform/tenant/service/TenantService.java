@@ -1,5 +1,6 @@
 package com.saasplatform.tenant.service;
 
+import com.saasplatform.common.exception.TenantAlreadyExistsException;
 import com.saasplatform.common.response.StandardApiResponse;
 import com.saasplatform.tenant.dto.TenantRequest;
 import com.saasplatform.tenant.dto.TenantResponse;
@@ -18,15 +19,16 @@ public class TenantService {
     }
 
     public StandardApiResponse<TenantResponse> createTenant(TenantRequest request){
-        try{
-            // Check duplicate email
-            if(tenantRepository.existsByEmail(request.getEmail())){
-                return StandardApiResponse.failure("Tenant already exists by this Slug");
-            }
+
 
             // Check duplicate slug
             if (tenantRepository.existsBySlug(request.getSlug())) {
-                return StandardApiResponse.failure("Slug already in use");
+                throw new TenantAlreadyExistsException("Tenant with slug '"+ request.getSlug() +  "' already exists");
+            }
+
+            // Check duplicate email
+            if(tenantRepository.existsByEmail(request.getEmail())){
+                throw new TenantAlreadyExistsException("Tenant with email already exists");
             }
 
             //Convert RequestDTO to Entity
@@ -56,10 +58,5 @@ public class TenantService {
                     .build();
 
             return StandardApiResponse.success("Tenant Created Successfully" , response);
-
-        } catch (Exception e) {
-            return StandardApiResponse.failure("Error Creating tenant");
-        }
-
     }
 }
