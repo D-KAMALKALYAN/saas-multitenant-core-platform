@@ -1,6 +1,7 @@
 package com.saasplatform.common.exception;
 
 import com.saasplatform.common.response.StandardApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +12,8 @@ import java.lang.Exception;
 import java.util.HashMap;
 import java.util.Map;
 
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -47,7 +50,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<StandardApiResponse<Void>> handleGenericException(Exception ex){
-
+        log.error("Unexpected error occurred", ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(StandardApiResponse.failure("An unexpected error occurred. Please try again."));
