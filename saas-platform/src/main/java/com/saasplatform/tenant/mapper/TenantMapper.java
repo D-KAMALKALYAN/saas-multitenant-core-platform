@@ -1,4 +1,4 @@
-package com.saasplatform.tenant.Mapper;
+package com.saasplatform.tenant.mapper;
 
 import com.saasplatform.tenant.dto.TenantResponse;
 import com.saasplatform.tenant.entity.Tenant;

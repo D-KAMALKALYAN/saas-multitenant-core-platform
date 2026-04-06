@@ -5,8 +5,4 @@ public enum PlanType {
     PRO,
     PREMIUM,
     ENTERPRISE;
-
-    public String na() {
-        return null;
-    }
 }
