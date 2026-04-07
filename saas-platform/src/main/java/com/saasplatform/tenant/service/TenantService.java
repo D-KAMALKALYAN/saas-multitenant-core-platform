@@ -10,11 +10,12 @@ import com.saasplatform.tenant.dto.TenantUpdateRequest;
 import com.saasplatform.tenant.entity.StatusType;
 import com.saasplatform.tenant.entity.Tenant;
 import com.saasplatform.tenant.repository.TenantRepository;
-import jakarta.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -56,6 +56,12 @@ public class GlobalExceptionHandler {
                 .body(StandardApiResponse.failure("An unexpected error occurred. Please try again."));
     }
 
+    @ExceptionHandler(TenantNotActiveException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleTenantNotActiveException(TenantNotActiveException ex){
 
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
 
 }

@@ -18,6 +18,8 @@ public interface TenantRepository extends JpaRepository<Tenant , UUID> {
 
     boolean existsBySlug(String slug);
 
+    Optional<Tenant> findBySlugAndDeletedAtIsNull(String slug);
+
     Optional<Tenant> findByIdAndDeletedAtIsNull(UUID id);
 
     Page<Tenant> findAllByDeletedAtIsNull(Pageable pageable);
