@@ -1,11 +1,9 @@
 package com.saasplatform.user.controller;
 
 import com.saasplatform.common.response.StandardApiResponse;
-import com.saasplatform.tenant.service.TenantService;
 import com.saasplatform.user.dto.UserRequest;
 import com.saasplatform.user.dto.UserResponse;
 import com.saasplatform.user.dto.UserUpdateRequest;
-import com.saasplatform.user.entity.User;
 import com.saasplatform.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

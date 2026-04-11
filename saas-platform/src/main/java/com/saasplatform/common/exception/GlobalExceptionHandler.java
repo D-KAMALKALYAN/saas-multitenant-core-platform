@@ -63,12 +63,6 @@ public class GlobalExceptionHandler {
                 .body(StandardApiResponse.failure(ex.getMessage()));
     }
 
-    @ExceptionHandler(UserNotActiveException.class)
-    public ResponseEntity<StandardApiResponse<Void>> handleUserNotActiveException(UserNotActiveException ex){
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(StandardApiResponse.failure(ex.getMessage()));
-    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<StandardApiResponse<Void>> handleUserNotFoundException(UserNotFoundException ex){
