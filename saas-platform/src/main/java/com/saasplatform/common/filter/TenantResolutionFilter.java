@@ -1,8 +1,10 @@
 package com.saasplatform.common.filter;
 
 import com.saasplatform.common.context.TenantContext;
+import com.saasplatform.common.context.TenantInfo;
 import com.saasplatform.common.exception.TenantNotActiveException;
 import com.saasplatform.common.exception.TenantNotFoundException;
+import com.saasplatform.tenant.entity.Tenant;
 import com.saasplatform.tenant.service.TenantValidationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,7 +49,7 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
         try {
             // 1. Check excluded paths
             if (isExcludedPath(request)) {
-                log.warn("Request excluded from tenant validation -> {} {}", method, path);
+                log.debug("Request excluded from tenant validation -> {} {}", method, path);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -63,7 +65,17 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
 
             // 3. Validate tenant
             try {
-                tenantValidationService.getActiveTenantBySlug(tenantSlug);
+                Tenant tenant =  tenantValidationService.getActiveTenantBySlug(tenantSlug);
+
+                TenantInfo tenantInfo = new TenantInfo(
+                        tenant.getId(),
+                        tenant.getSlug(),
+                        tenant.getName(),
+                        tenant.getPlan().name()
+                );
+
+                // 4. Set context
+                TenantContext.setTenant(tenantInfo);
 
             } catch (TenantNotFoundException ex) {
                 log.error("Tenant not found -> {}", tenantSlug);
@@ -75,9 +87,6 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
                 writeErrorResponse(response, 403, ex.getMessage());
                 return;
             }
-
-            // 4. Set context
-            TenantContext.setTenantId(tenantSlug);
 
             // 5. Continue filter chain
             filterChain.doFilter(request, response);

@@ -58,4 +58,8 @@ public class Tenant {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    public boolean isActive() {
+        return this.status == StatusType.ACTIVE;
+    }
+
 }

@@ -58,9 +58,29 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TenantNotActiveException.class)
     public ResponseEntity<StandardApiResponse<Void>> handleTenantNotActiveException(TenantNotActiveException ex){
-
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotActiveException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleUserNotActiveException(UserNotActiveException ex){
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleUserNotFoundException(UserNotFoundException ex){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleUserAlreadyExistsException(UserAlreadyExistsException ex){
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(StandardApiResponse.failure(ex.getMessage()));
     }
 
