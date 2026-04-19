@@ -78,4 +78,11 @@ public class GlobalExceptionHandler {
                 .body(StandardApiResponse.failure(ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException ex){
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
 }

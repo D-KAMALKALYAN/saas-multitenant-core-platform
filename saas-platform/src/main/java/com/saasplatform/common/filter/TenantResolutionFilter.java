@@ -29,7 +29,8 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
     }
 
     private static final List<String[]> EXCLUDED_PATHS = List.of(
-            new String[]{"POST",  "/api/v1/tenants"},   // only POST is public
+            new String[]{"POST",  "/api/v1/tenants"},
+            new String[]{"POST",  "/api/v1/auth"}, // only POST is public
             new String[]{"GET",   "/swagger-ui"},
             new String[]{"GET",   "/v3/api-docs"},
             new String[]{"GET",   "/actuator/health"}

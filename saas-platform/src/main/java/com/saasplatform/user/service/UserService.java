@@ -4,7 +4,6 @@ import com.saasplatform.common.context.TenantContext;
 import com.saasplatform.common.exception.UserAlreadyExistsException;
 import com.saasplatform.common.exception.UserNotFoundException;
 import com.saasplatform.common.response.StandardApiResponse;
-import com.saasplatform.tenant.repository.TenantRepository;
 import com.saasplatform.user.dto.UserRequest;
 import com.saasplatform.user.dto.UserResponse;
 import com.saasplatform.user.dto.UserUpdateRequest;
@@ -16,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,9 +26,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private static final int MAX_PAGE_SIZE = 100;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public StandardApiResponse<UserResponse> createUser(UserRequest request){
@@ -43,7 +45,8 @@ public class UserService {
         User user = UserMapper.toEntity(request);
         user.setTenantId(tenantId);
         user.setEmail(request.getEmail().toLowerCase());
-        user.setPassword(request.getPassword());
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        user.setPassword(hashedPassword);
 
         User savedUser = userRepository.save(user);
 

@@ -7,6 +7,8 @@ import com.saasplatform.tenant.entity.Tenant;
 import com.saasplatform.tenant.repository.TenantRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class TenantValidationService {
 
@@ -28,4 +30,20 @@ public class TenantValidationService {
 
         return tenant;
     }
+
+    public Tenant getActiveTenantByTenantId(UUID id){
+
+        Tenant tenant = tenantRepository
+                .findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new TenantNotFoundException("Tenant Not Found"));
+
+        if(!tenant.getStatus().equals(StatusType.ACTIVE)){
+            throw new TenantNotActiveException("Tenant Not Active");
+        }
+
+        return tenant;
+
+    }
+
+
 }

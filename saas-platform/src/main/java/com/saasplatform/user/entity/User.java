@@ -68,4 +68,9 @@ public class User {
     private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;
+
+
+    public boolean isActive() {
+        return this.status == StatusType.ACTIVE;
+    }
 }
