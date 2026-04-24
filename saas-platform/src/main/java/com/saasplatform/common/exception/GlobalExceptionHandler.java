@@ -85,4 +85,18 @@ public class GlobalExceptionHandler {
                 .body(StandardApiResponse.failure(ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex){
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleRefreshTokenExpiredException(RefreshTokenExpiredException ex){
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
 }

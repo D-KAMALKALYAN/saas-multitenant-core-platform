@@ -30,11 +30,15 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
 
     private static final List<String[]> EXCLUDED_PATHS = List.of(
             new String[]{"POST",  "/api/v1/tenants"},
-            new String[]{"POST",  "/api/v1/auth"}, // only POST is public
+            new String[]{"POST", "/api/v1/auth/login"},
+            new String[]{"POST", "/api/v1/auth/refresh"},
+            new String[]{"POST", "/api/v1/auth/logout"},
             new String[]{"GET",   "/swagger-ui"},
             new String[]{"GET",   "/v3/api-docs"},
             new String[]{"GET",   "/actuator/health"}
     );
+
+
 
     @Override
     protected void doFilterInternal(
@@ -48,6 +52,14 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
         log.info("Tenant filter triggered -> {} {}", method, path);
 
         try {
+            // Check if TenantContext is already set by JWTFilter
+            if (TenantContext.hasTenant()) {
+                // Context already set by JwtAuthFilter
+                // Skip DB validation entirely
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             // 1. Check excluded paths
             if (isExcludedPath(request)) {
                 log.debug("Request excluded from tenant validation -> {} {}", method, path);

@@ -24,14 +24,14 @@ public class JwtService {
     // Generate Access Token
     public String generateAccessToken(User user, TenantInfo tenant) {
         return Jwts.builder()
-                .setSubject(user.getId().toString())
+                .subject(user.getId().toString())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().name())
                 .claim("tenantId", tenant.id().toString())
                 .claim("slug", tenant.slug())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiry))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiry))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -48,10 +48,10 @@ public class JwtService {
     // Extract Claims
     public Claims extractClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(getSigningKey())
+                .verifyWith(getSigningKey())             // not setSigningKey()
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)               // not parseClaimsJws()
+                .getPayload();                           // not getBody()
     }
 
     // Signing Key

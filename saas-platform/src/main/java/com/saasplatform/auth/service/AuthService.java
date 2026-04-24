@@ -7,6 +7,8 @@ import com.saasplatform.auth.repository.RefreshTokenRepository;
 import com.saasplatform.common.config.JwtService;
 import com.saasplatform.common.context.TenantInfo;
 import com.saasplatform.common.exception.InvalidCredentialsException;
+import com.saasplatform.common.exception.InvalidRefreshTokenException;
+import com.saasplatform.common.exception.RefreshTokenExpiredException;
 import com.saasplatform.common.response.StandardApiResponse;
 import com.saasplatform.tenant.entity.Tenant;
 import com.saasplatform.tenant.repository.TenantRepository;
@@ -89,11 +91,11 @@ public class AuthService {
     public StandardApiResponse<AuthTokens> refresh(String refreshToken){
         RefreshToken tokenEntity = refreshTokenRepository
                 .findByToken(refreshToken)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
 
         if(tokenEntity.isRevoked() ||
         tokenEntity.getExpiresAt().isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Refresh token expired or revoked");
+            throw new RefreshTokenExpiredException("Refresh token expired or revoked");
         }
 
         User user = tokenEntity.getUser();
@@ -127,11 +129,15 @@ public class AuthService {
 
     public StandardApiResponse<Void> logout(String refreshToken){
 
-        refreshTokenRepository.findByToken(refreshToken)
-                .ifPresent(token -> {
-                    token.setRevoked(true);
-                    refreshTokenRepository.save(token);
-                });
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid or expired refresh token"));
+
+        if (token.isRevoked()) {
+            throw new InvalidRefreshTokenException("Invalid or expired refresh token");
+        }
+
+        token.setRevoked(true);
+        refreshTokenRepository.save(token);
 
         return StandardApiResponse.success("Logout Successful");
 
