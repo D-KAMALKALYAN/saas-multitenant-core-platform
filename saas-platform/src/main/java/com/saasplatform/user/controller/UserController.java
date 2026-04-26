@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @Operation(
             summary = "Create user",
             description = "Creates a new user for the current tenant. Email must be unique within the tenant."
@@ -43,6 +45,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' , 'MEMBER' , 'VIEWER')")
     @Operation(
             summary = "Get all users",
             description = "Fetches a paginated list of users for the current tenant. Supports page and size parameters."
@@ -57,6 +60,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' , 'MEMBER' , 'VIEWER')")
     @Operation(
             summary = "Get user by ID",
             description = "Retrieves a specific user by ID within the current tenant."
@@ -70,6 +74,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @Operation(
             summary = "Delete user",
             description = "Soft deletes a user by marking them as inactive and setting deletedAt timestamp."
@@ -83,6 +88,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' ,  'MEMBER')")
     @Operation(
             summary = "Update user",
             description = "Updates user details such as name, email, or role for the current tenant."

@@ -76,12 +76,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             TenantContext.setTenant(tenantInfo);
 
+            String normalizedRole = role.toUpperCase();
+
             // Step 6: Set Spring SecurityContext
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                            List.of(new SimpleGrantedAuthority("ROLE_" + normalizedRole))
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);

@@ -15,6 +15,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -107,20 +111,45 @@ public class UserService {
                 .findByIdAndTenantIdAndDeletedAtIsNull(id , tenantId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        // Ownership check for MEMBER role
+        Authentication auth = SecurityContextHolder
+                .getContext().getAuthentication();
+
+
+
+        boolean isAdmin = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN") || role.equals("ROLE_SUPER_ADMIN"));
+
+
+        if (!isAdmin) {
+            // MEMBER — verify they own this resource
+            String authenticatedEmail = auth.getName();
+            if (!user.getEmail().equalsIgnoreCase(authenticatedEmail)){
+                throw new AccessDeniedException(
+                        "You can only update your own profile");
+            }
+        }
 
         if(request.getFirstName() != null){
             user.setFirstName(request.getFirstName());
         }
 
         if(request.getLastName() != null){
-            user.setFirstName(request.getLastName());
+            user.setLastName(request.getLastName());
         }
 
-        if(request.getEmail() != null){
+        if (request.getEmail() != null) {
+            if (!isAdmin) {
+                throw new AccessDeniedException("Only ADMIN can update email");
+            }
             user.setEmail(request.getEmail());
         }
 
-        if(request.getRole() != null){
+        if (request.getRole() != null) {
+            if (!isAdmin) {
+                throw new AccessDeniedException("Only ADMIN can change roles");
+            }
             user.setRole(request.getRole());
         }
 

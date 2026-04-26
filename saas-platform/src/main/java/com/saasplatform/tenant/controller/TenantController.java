@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class TenantController {
             summary = "Create a new tenant",
             description = "This API creates a tenant with name, email, and slug"
     )
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping
     public ResponseEntity<StandardApiResponse<TenantResponse>> createTenant(@Valid @RequestBody TenantRequest request){
         return ResponseEntity
@@ -41,6 +43,7 @@ public class TenantController {
             summary = "Get tenant by ID",
             description = "Retrieves tenant details for the given tenant ID. Returns 404 if the tenant does not exist or is soft-deleted."
     )
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<StandardApiResponse<TenantResponse>> getTenantById(@PathVariable UUID id){
         return ResponseEntity
@@ -55,7 +58,9 @@ public class TenantController {
                     "Accepts page number and size as query parameters. " +
                     "Throws 404 if no tenants are found."
     )
+
     @GetMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' , 'MEMBER' , 'VIEWER')")
     public ResponseEntity<StandardApiResponse<List<TenantResponse>>> getAllTenants(@RequestParam(defaultValue = "0") int page,
                                                                                    @RequestParam(defaultValue = "10") int size){
         return ResponseEntity
@@ -70,6 +75,7 @@ public class TenantController {
                     "Returns HTTP 200 on successful deletion. " +
                     "Throws 404 if the tenant does not exist or is already deleted."
     )
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<StandardApiResponse<Void>> deleteTenant(@PathVariable UUID id){
         return ResponseEntity
@@ -81,6 +87,7 @@ public class TenantController {
             summary = "Update Tenant",
             description = "Partially updates tenant details like name, email, or plan"
     )
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<StandardApiResponse<TenantResponse>> updateTenant(@PathVariable UUID id , @Valid @RequestBody TenantUpdateRequest request){
         return  ResponseEntity

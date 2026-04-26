@@ -63,7 +63,6 @@ public class GlobalExceptionHandler {
                 .body(StandardApiResponse.failure(ex.getMessage()));
     }
 
-
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<StandardApiResponse<Void>> handleUserNotFoundException(UserNotFoundException ex){
         return ResponseEntity
@@ -97,6 +96,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex){
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(StandardApiResponse.failure("Access denied — insufficient permissions"));
     }
 
 }
