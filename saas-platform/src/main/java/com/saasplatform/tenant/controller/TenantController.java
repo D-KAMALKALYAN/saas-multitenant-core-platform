@@ -60,7 +60,7 @@ public class TenantController {
     )
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' , 'MEMBER' , 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<StandardApiResponse<List<TenantResponse>>> getAllTenants(@RequestParam(defaultValue = "0") int page,
                                                                                    @RequestParam(defaultValue = "10") int size){
         return ResponseEntity

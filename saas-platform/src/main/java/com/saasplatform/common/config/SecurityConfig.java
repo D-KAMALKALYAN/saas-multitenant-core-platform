@@ -15,14 +15,26 @@
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http)
                 throws Exception {
+
             http
                     .csrf(csrf -> csrf.disable())
+
                     .sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     )
+
                     .authorizeHttpRequests(auth -> auth
-                            .anyRequest().permitAll()
+                            .requestMatchers(
+                                    "/api/v1/auth/**",
+                                    "/api/v1/tenants",
+                                    "/swagger-ui/**",
+                                    "/v3/api-docs/**"
+                            ).permitAll()
+
+                            // everything else MUST be authenticated
+                            .anyRequest().authenticated()
                     );
+
             return http.build();
         }
 
