@@ -1,10 +1,13 @@
 package com.saasplatform.auth.service;
 
+import com.saasplatform.audit.annotation.Auditable;
+import com.saasplatform.audit.entity.AuditAction;
 import com.saasplatform.auth.dto.AuthTokens;
 import com.saasplatform.auth.dto.LoginRequest;
 import com.saasplatform.auth.entity.RefreshToken;
 import com.saasplatform.auth.repository.RefreshTokenRepository;
 import com.saasplatform.common.config.JwtService;
+import com.saasplatform.common.context.AuditContext;
 import com.saasplatform.common.context.TenantInfo;
 import com.saasplatform.common.exception.InvalidCredentialsException;
 import com.saasplatform.common.exception.InvalidRefreshTokenException;
@@ -39,6 +42,7 @@ public class AuthService {
     @Value("${app.jwt.access-token-expiry}")
     private long accessTokenExpiry;
 
+    @Auditable(action = AuditAction.LOGIN_SUCCESS, entityType = "AUTH")
     public StandardApiResponse<AuthTokens> login(LoginRequest request){
 
         //Validate Tenant
@@ -66,6 +70,8 @@ public class AuthService {
                 tenant.getName(),
                 tenant.getPlan().name()
         );
+
+        AuditContext.setTenantId(tenant.getId());
 
         //Generate Access Token
         String accessToken = jwtService.generateAccessToken(user , tenantInfo);

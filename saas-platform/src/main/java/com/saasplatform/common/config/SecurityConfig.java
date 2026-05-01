@@ -1,45 +1,56 @@
-    package com.saasplatform.common.config;
+package com.saasplatform.common.config;
 
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
-    import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-    import org.springframework.security.config.http.SessionCreationPolicy;
-    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-    import org.springframework.security.web.SecurityFilterChain;
 
-    @Configuration
-    @EnableMethodSecurity
-    public class SecurityConfig {
+import com.saasplatform.common.filter.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http)
-                throws Exception {
+@Configuration
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
 
-            http
-                    .csrf(csrf -> csrf.disable())
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-                    .sessionManagement(session -> session
-                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    )
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(
-                                    "/api/v1/auth/**",
-                                    "/api/v1/tenants",
-                                    "/swagger-ui/**",
-                                    "/v3/api-docs/**"
-                            ).permitAll()
+        http
+                .csrf(csrf -> csrf.disable())
 
-                            // everything else MUST be authenticated
-                            .anyRequest().authenticated()
-                    );
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
-            return http.build();
-        }
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/api/v1/tenants",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
 
-        @Bean
-        public BCryptPasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder(10);
-        }
+                        .anyRequest().authenticated()
+                )
+
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
+        return http.build();
     }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
+}

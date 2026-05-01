@@ -1,5 +1,7 @@
 package com.saasplatform.tenant.service;
 
+import com.saasplatform.audit.annotation.Auditable;
+import com.saasplatform.audit.entity.AuditAction;
 import com.saasplatform.common.exception.TenantAlreadyExistsException;
 import com.saasplatform.common.exception.TenantNotFoundException;
 import com.saasplatform.common.response.StandardApiResponse;
@@ -33,6 +35,11 @@ public class TenantService {
         this.tenantRepository = tenantRepository;
     }
 
+
+    @Auditable(
+            action = AuditAction.TENANT_CREATED,
+            entityType = "TENANT"
+    )
     public StandardApiResponse<TenantResponse> createTenant(TenantRequest request){
 
 
@@ -90,6 +97,10 @@ public class TenantService {
         return StandardApiResponse.success("Success", response);
     }
 
+    @Auditable(
+            action = AuditAction.TENANT_DELETED,
+            entityType = "TENANT"
+    )
     public StandardApiResponse<Void> deleteTenant(UUID id){
 
         Tenant tenant = tenantRepository.findByIdAndDeletedAtIsNull(id)
@@ -104,6 +115,10 @@ public class TenantService {
     }
 
     @Transactional
+    @Auditable(
+            action = AuditAction.TENANT_UPDATED,
+            entityType = "TENANT"
+    )
     public StandardApiResponse<TenantResponse> updateTenant(UUID id , TenantUpdateRequest request){
         Tenant tenant = tenantRepository
                 .findByIdAndDeletedAtIsNull(id)

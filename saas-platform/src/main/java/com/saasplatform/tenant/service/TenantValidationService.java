@@ -18,6 +18,10 @@ public class TenantValidationService {
         this.tenantRepository = tenantRepository;
     }
 
+//    @Auditable(
+//            action = AuditAction.TENANT_VALIDATED_BY_SLUG,
+//            entityType = "TENANT"
+//    )
     public Tenant getActiveTenantBySlug(String slug){
 
         Tenant tenant = tenantRepository
@@ -31,6 +35,10 @@ public class TenantValidationService {
         return tenant;
     }
 
+//    @Auditable(
+//            action = AuditAction.TENANT_VALIDATED_BY_ID,
+//            entityType = "TENANT"
+//    )
     public Tenant getActiveTenantByTenantId(UUID id){
 
         Tenant tenant = tenantRepository
