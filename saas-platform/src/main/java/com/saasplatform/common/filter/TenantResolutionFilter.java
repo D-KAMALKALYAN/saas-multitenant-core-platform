@@ -1,6 +1,6 @@
 package com.saasplatform.common.filter;
 
-import com.saasplatform.common.context.AuditContext;
+
 import com.saasplatform.common.context.TenantContext;
 import com.saasplatform.common.context.TenantInfo;
 import com.saasplatform.common.exception.TenantNotActiveException;
@@ -90,7 +90,6 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
 
                 // 4. Set context
                 TenantContext.setTenant(tenantInfo);
-                AuditContext.setTenantId(tenant.getId());
 
             } catch (TenantNotFoundException ex) {
                 log.error("Tenant not found -> {}", tenantSlug);

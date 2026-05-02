@@ -5,7 +5,6 @@ import com.saasplatform.audit.entity.AuditAction;
 import com.saasplatform.audit.entity.AuditStatus;
 import com.saasplatform.audit.service.AuditService;
 import com.saasplatform.auth.dto.LoginRequest;
-import com.saasplatform.common.context.AuditContext;
 import com.saasplatform.common.context.TenantContext;
 import com.saasplatform.tenant.entity.Tenant;
 import com.saasplatform.tenant.repository.TenantRepository;
