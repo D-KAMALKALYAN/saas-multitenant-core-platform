@@ -2,6 +2,7 @@ package com.saasplatform.common.config;
 
 
 import com.saasplatform.common.filter.JwtAuthenticationFilter;
+import com.saasplatform.ratelimit.filter.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -44,6 +46,11 @@ public class SecurityConfig {
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+
+                 .addFilterAfter(
+                        rateLimitFilter,
+                        JwtAuthenticationFilter.class
                 );
 
         return http.build();

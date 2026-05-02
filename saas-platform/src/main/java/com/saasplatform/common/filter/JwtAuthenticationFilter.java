@@ -66,13 +66,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String slug     = claims.get("slug", String.class);
             String role     = claims.get("role", String.class);
             String email    = claims.get("email", String.class);
+            String plan     = claims.get("plan", String.class);
 
             // Step 5: Set TenantContext
             TenantInfo tenantInfo = new TenantInfo(
                     UUID.fromString(tenantId),
                     slug,
                     null,
-                    null
+                    plan
             );
             TenantContext.setTenant(tenantInfo);
 

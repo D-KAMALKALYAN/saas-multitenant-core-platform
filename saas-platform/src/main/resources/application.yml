@@ -15,7 +15,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
+
+  properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
@@ -23,7 +24,14 @@ spring:
 app:
   security:
     bcrypt-strength: 10
+
   jwt:
     secret: 87be8d19b767e23b8bae50fe657b8cd240e7cb167caf36814d9f4c4d61693a63
     access-token-expiry: 3600000
     refresh-token-expiry: 2592000000
+
+  rate-limit:
+      plans:
+        basic: 100
+        pro: 500
+        enterprise: 2000
