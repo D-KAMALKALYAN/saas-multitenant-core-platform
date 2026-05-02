@@ -4,8 +4,11 @@ import com.saasplatform.audit.annotation.Auditable;
 import com.saasplatform.audit.entity.AuditAction;
 import com.saasplatform.audit.entity.AuditStatus;
 import com.saasplatform.audit.service.AuditService;
+import com.saasplatform.auth.dto.LoginRequest;
 import com.saasplatform.common.context.AuditContext;
 import com.saasplatform.common.context.TenantContext;
+import com.saasplatform.tenant.entity.Tenant;
+import com.saasplatform.tenant.repository.TenantRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,25 +29,26 @@ public class AuditAspect {
 
     private final AuditService auditService;
     private final HttpServletRequest request;
+    private final TenantRepository tenantRepository;
 
     @Around("@annotation(auditable)")
     public Object logAudit(
             ProceedingJoinPoint joinPoint,
             Auditable auditable) throws Throwable {
 
-        String ip = request.getRemoteAddr();
+        String ip        = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
+        AuditAction action    = auditable.action();
+        String entityType     = auditable.entityType();
+        String entityId       = extractEntityId(joinPoint);
 
-        AuditAction action = auditable.action();
-        String entityType = auditable.entityType();
-        String entityId = extractEntityId(joinPoint);
+        // Extract ALL context before proceed()
+        UUID tenantId    = extractTenantId(joinPoint);
+        UUID userId      = extractUserId();
+        String userEmail = extractUserEmail();
 
         try {
             Object result = joinPoint.proceed();
-
-            UUID tenantId = extractTenantId();   // AFTER method
-            UUID userId = extractUserId();
-            String userEmail = extractUserEmail();
 
             auditService.log(
                     tenantId,
@@ -62,10 +66,6 @@ public class AuditAspect {
 
         } catch (Exception ex) {
 
-            UUID tenantId = extractTenantId();
-            UUID userId = extractUserId();
-            String userEmail = extractUserEmail();
-
             auditService.log(
                     tenantId,
                     userId,
@@ -82,18 +82,26 @@ public class AuditAspect {
         }
     }
 
-    private UUID extractTenantId() {
-        // Try TenantContext first (authenticated requests)
+    private UUID extractTenantId(ProceedingJoinPoint joinPoint) {
+
+        // Priority 1 — TenantContext (authenticated requests)
         try {
             UUID id = TenantContext.getTenantId();
             if (id != null) return id;
         } catch (Exception ignored) {}
 
-        // Fallback to AuditContext (public endpoints like login)
-        UUID auditTenantId = AuditContext.getTenantId();
-        if (auditTenantId != null) return auditTenantId;
+        // Priority 2 — Inspect LoginRequest argument (login endpoint)
+        for (Object arg : joinPoint.getArgs()) {
+            if (arg instanceof LoginRequest loginRequest) {
+                try {
+                    return tenantRepository
+                            .findBySlugAndDeletedAtIsNull(loginRequest.getSlug())
+                            .map(Tenant::getId)
+                            .orElse(null);
+                } catch (Exception ignored) {}
+            }
+        }
 
-        // Truly no tenant context (system events)
         return null;
     }
 

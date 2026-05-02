@@ -26,6 +26,7 @@ public class AuditService {
 
     private final AuditLogRepository auditLogRepository;
 
+    @Async
     public void log(
             UUID tenantId,
             UUID userId,

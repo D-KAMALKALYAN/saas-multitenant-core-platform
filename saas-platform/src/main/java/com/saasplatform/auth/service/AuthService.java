@@ -71,8 +71,6 @@ public class AuthService {
                 tenant.getPlan().name()
         );
 
-        AuditContext.setTenantId(tenant.getId());
-
         //Generate Access Token
         String accessToken = jwtService.generateAccessToken(user , tenantInfo);
 
