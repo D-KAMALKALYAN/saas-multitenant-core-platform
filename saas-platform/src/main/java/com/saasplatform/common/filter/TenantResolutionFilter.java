@@ -72,7 +72,7 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
             String tenantSlug = request.getHeader("X-Tenant-ID");
 
             if (tenantSlug == null || tenantSlug.isBlank()) {
-                log.error("Missing X-Tenant-ID header");
+                log.warn("Missing X-Tenant-ID header");
                 writeErrorResponse(response, 400, "Missing X-Tenant-ID header");
                 return;
             }

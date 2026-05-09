@@ -82,7 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Step 6: Set Spring SecurityContext
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
-                            email,
+                            userId,
                             null,
                             List.of(new SimpleGrantedAuthority("ROLE_" + normalizedRole))
                     );
@@ -98,7 +98,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             // VERY IMPORTANT → prevent thread leakage
             TenantContext.clear();
-            SecurityContextHolder.clearContext();
         }
     }
 

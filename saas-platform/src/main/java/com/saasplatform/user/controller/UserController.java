@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Tag(
         name = "User API",
-        description = "APIs for managing users within a tenant. All endpoints require a valid X-Tenant-ID header."
+        description = "APIs for managing users within a tenant."
 )
 @RestController
 @RequestMapping("/api/v1/users")
@@ -26,18 +26,21 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PreAuthorize(
+            "hasAnyRole('SUPER_ADMIN', 'ADMIN') " +
+                    "or hasAuthority('users:write')"
+    )
     @Operation(
             summary = "Create user",
-            description = "Creates a new user for the current tenant. Email must be unique within the tenant."
+            description = "Creates a new user for the current tenant."
     )
     public ResponseEntity<StandardApiResponse<UserResponse>> createUser(
-            @Valid @RequestBody UserRequest request){
+            @Valid @RequestBody UserRequest request) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -45,60 +48,72 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' , 'MEMBER' , 'VIEWER')")
+    @PreAuthorize(
+            "hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MEMBER', 'VIEWER') " +
+                    "or hasAuthority('users:read')"
+    )
     @Operation(
             summary = "Get all users",
-            description = "Fetches a paginated list of users for the current tenant. Supports page and size parameters."
+            description = "Fetches all users for the current tenant."
     )
     public ResponseEntity<StandardApiResponse<List<UserResponse>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
+            @RequestParam(defaultValue = "10") int size) {
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userService.getAllUsers(page , size));
+        return ResponseEntity.ok(
+                userService.getAllUsers(page, size)
+        );
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' , 'MEMBER' , 'VIEWER')")
+    @PreAuthorize(
+            "hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MEMBER', 'VIEWER') " +
+                    "or hasAuthority('users:read')"
+    )
     @Operation(
             summary = "Get user by ID",
-            description = "Retrieves a specific user by ID within the current tenant."
+            description = "Retrieves a specific user by ID."
     )
     public ResponseEntity<StandardApiResponse<UserResponse>> getUserById(
-            @PathVariable UUID id){
+            @PathVariable UUID id) {
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userService.getUserById(id));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    @Operation(
-            summary = "Delete user",
-            description = "Soft deletes a user by marking them as inactive and setting deletedAt timestamp."
-    )
-    public ResponseEntity<StandardApiResponse<Void>> deleteUser(
-            @PathVariable UUID id){
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userService.deleteUser(id));
+        return ResponseEntity.ok(
+                userService.getUserById(id)
+        );
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN' ,  'MEMBER')")
+    @PreAuthorize(
+            "hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MEMBER') " +
+                    "or hasAuthority('users:write')"
+    )
     @Operation(
             summary = "Update user",
-            description = "Updates user details such as name, email, or role for the current tenant."
+            description = "Updates user details."
     )
     public ResponseEntity<StandardApiResponse<UserResponse>> updateUser(
             @PathVariable UUID id,
-            @Valid @RequestBody UserUpdateRequest request){
+            @Valid @RequestBody UserUpdateRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userService.updateUser(id , request));
+        return ResponseEntity.ok(
+                userService.updateUser(id, request)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize(
+            "hasAnyRole('SUPER_ADMIN', 'ADMIN') " +
+                    "or hasAuthority('users:delete')"
+    )
+    @Operation(
+            summary = "Delete user",
+            description = "Soft deletes a user."
+    )
+    public ResponseEntity<StandardApiResponse<Void>> deleteUser(
+            @PathVariable UUID id) {
+
+        return ResponseEntity.ok(
+                userService.deleteUser(id)
+        );
     }
 }
