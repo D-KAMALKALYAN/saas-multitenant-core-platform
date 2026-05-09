@@ -3,6 +3,7 @@ package com.saasplatform.audit.controller;
 import com.saasplatform.audit.entity.AuditAction;
 import com.saasplatform.audit.service.AuditService;
 import com.saasplatform.common.response.StandardApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,12 +15,21 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/audit-logs")
-@Tag(name = "Audit API")
+@Tag(
+        name = "Audit API",
+        description = "APIs for viewing and filtering audit logs"
+)
 @RequiredArgsConstructor
 public class AuditController {
 
     private final AuditService auditService;
 
+    @Operation(
+            summary = "Get audit logs",
+            description = "Retrieves paginated audit logs with optional filters " +
+                    "such as action type and date range. " +
+                    "Accessible only by SUPER_ADMIN and ADMIN users."
+    )
     @GetMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     public ResponseEntity<StandardApiResponse<?>> getAuditLogs(

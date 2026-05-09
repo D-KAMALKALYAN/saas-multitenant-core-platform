@@ -22,7 +22,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RateLimitFilter rateLimitFilter;
-    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter apiKeyFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -52,10 +52,7 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
 
-                .addFilterAfter(
-                        apiKeyAuthenticationFilter,
-                        JwtAuthenticationFilter.class
-                )
+                .addFilterAfter(apiKeyFilter, JwtAuthenticationFilter.class)
 
                  .addFilterAfter(
                         rateLimitFilter,

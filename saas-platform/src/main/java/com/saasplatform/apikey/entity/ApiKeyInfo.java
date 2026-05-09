@@ -15,31 +15,14 @@ import java.util.UUID;
  * - Store only authentication-related metadata
  * - Never cache sensitive raw API keys
  */
+// Clean record — no JPA annotations
 public record ApiKeyInfo(
-
-        // API key ID
         UUID keyId,
-
-        // Tenant owning this key
         UUID tenantId,
-
-        // Used for TenantContext + routing
         String tenantSlug,
-
-        // Display / logging purposes
         String tenantName,
-
-        // Tenant subscription plan
         String plan,
-
-        @ElementCollection(fetch = FetchType.EAGER)
         List<String> scopes,
-
-        // ACTIVE / REVOKED
         String status,
-
-        // Expiration validation
         LocalDateTime expiresAt
-
-) {
-}
+) {}

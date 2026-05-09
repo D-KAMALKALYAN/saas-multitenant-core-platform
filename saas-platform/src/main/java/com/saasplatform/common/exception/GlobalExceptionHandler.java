@@ -105,4 +105,11 @@ public class GlobalExceptionHandler {
                 .body(StandardApiResponse.failure("Access denied — insufficient permissions"));
     }
 
+    @ExceptionHandler(ApiKeyNotFoundException.class)
+    public ResponseEntity<StandardApiResponse<Void>> handleApiKeyNotFoundException(ApiKeyNotFoundException ex){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(StandardApiResponse.failure(ex.getMessage()));
+    }
+
 }
