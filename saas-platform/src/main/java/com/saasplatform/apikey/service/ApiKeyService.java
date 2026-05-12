@@ -52,7 +52,7 @@ public class ApiKeyService {
         apiKey.setName(request.getName());
         apiKey.setKeyPrefix(prefix);
         apiKey.setKeyHash(keyHash);
-        apiKey.setScopes(Collections.singletonList(request.getScopes()));
+        apiKey.setScopes(String.join(",", request.getScopeList()));
         apiKey.setStatus(ApiKeyStatus.ACTIVE);
         apiKey.setExpiresAt(expiresAt);
         apiKey.setCreatedAt(LocalDateTime.now());

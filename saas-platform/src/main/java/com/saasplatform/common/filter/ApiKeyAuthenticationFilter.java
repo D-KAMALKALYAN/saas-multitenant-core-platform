@@ -132,16 +132,22 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
             List<SimpleGrantedAuthority> authorities =
                     new ArrayList<>();
 
-            if (keyInfo.scopes() != null) {
+            // Parse CSV scopes
+            if (keyInfo.scopes() != null &&
+                    !keyInfo.scopes().isBlank()) {
 
-                authorities.addAll(
-                        keyInfo.scopes()
+                List<SimpleGrantedAuthority> scopeAuthorities =
+                        List.of(keyInfo.scopes().split(","))
                                 .stream()
+                                .map(String::trim)
+                                .filter(scope -> !scope.isBlank())
                                 .map(SimpleGrantedAuthority::new)
-                                .toList()
-                );
+                                .toList();
+
+                authorities.addAll(scopeAuthorities);
             }
 
+            // System role for API clients
             authorities.add(
                     new SimpleGrantedAuthority("ROLE_API")
             );
@@ -200,9 +206,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                 key.getTenant().getSlug(),
                 key.getTenant().getName(),
                 key.getTenant().getPlan().name(),
-                key.getScopes() != null
-                        ? key.getScopes()
-                        : List.of(),
+                key.getScopes(),
                 key.getStatus().name(),
                 key.getExpiresAt()
         );

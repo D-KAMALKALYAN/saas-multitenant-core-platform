@@ -22,7 +22,7 @@ public record ApiKeyInfo(
         String tenantSlug,
         String tenantName,
         String plan,
-        List<String> scopes,
+        String scopes,
         String status,
         LocalDateTime expiresAt
 ) {}

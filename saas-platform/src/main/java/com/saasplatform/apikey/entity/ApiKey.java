@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class ApiKey {
     private String keyHash;
 
     @Column(name = "scope")
-    private List<String> scopes = new ArrayList<>();
+    private String scopes;
 
     @Enumerated(EnumType.STRING)
     private ApiKeyStatus status;
@@ -53,5 +54,10 @@ public class ApiKey {
     private LocalDateTime revokedAt;
     private LocalDateTime createdAt;
 
+
+    public List<String> getScopeList() {
+        if (scopes == null || scopes.isBlank()) return List.of();
+        return Arrays.asList(scopes.split(","));
+    }
 
 }
