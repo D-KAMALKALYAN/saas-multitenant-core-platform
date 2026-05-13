@@ -47,17 +47,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
 
-                .addFilterAfter(apiKeyFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(rateLimitFilter,
+                        UsernamePasswordAuthenticationFilter.class)
 
-                 .addFilterAfter(
-                        rateLimitFilter,
-                        JwtAuthenticationFilter.class
-                );
+                .addFilterBefore(apiKeyFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

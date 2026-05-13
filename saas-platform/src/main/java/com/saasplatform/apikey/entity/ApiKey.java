@@ -33,25 +33,33 @@ public class ApiKey {
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "created_by", nullable = false)
     private UUID createdBy;
 
     private String name;
 
+    @Column(name = "key_prefix")
     private String keyPrefix;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "key_hash", unique = true, nullable = false)
     private String keyHash;
 
-    @Column(name = "scope")
+    @Column(name = "scopes")
     private String scopes;
 
     @Enumerated(EnumType.STRING)
     private ApiKeyStatus status;
 
+    @Column(name = "last_used_at")
     private LocalDateTime lastUsedAt;
+
+    @Column(name = "expires_at")
     private LocalDateTime expiresAt;
+
+    @Column(name = "revoked_at")
     private LocalDateTime revokedAt;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
 
@@ -61,3 +69,6 @@ public class ApiKey {
     }
 
 }
+
+
+
