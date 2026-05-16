@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,10 +25,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HexFormat;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -172,6 +170,9 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
             // ASYNC LAST USED UPDATE
             apiKeyService.updateLastUsed(keyInfo.keyId());
 
+            MDC.put("tenantSlug", keyInfo.tenantSlug());
+            MDC.put("requestId",  UUID.randomUUID().toString());
+
             filterChain.doFilter(request, response);
 
         } finally {
@@ -180,7 +181,9 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.clearContext();
 
-            log.debug("Security context cleared");
+            MDC.clear();
+
+            log.debug("context's cleared");
         }
     }
 

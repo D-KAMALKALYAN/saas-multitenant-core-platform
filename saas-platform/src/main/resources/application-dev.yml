@@ -11,6 +11,10 @@ spring:
     enabled: true
 
 logging:
+
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%X{tenantSlug}] [%X{requestId}] %logger{20} - %msg%n"
+
   level:
     com.saasplatform: DEBUG
     org.springframework.security: DEBUG

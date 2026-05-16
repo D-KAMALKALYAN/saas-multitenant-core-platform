@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -77,6 +78,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             TenantContext.setTenant(tenantInfo);
 
+
+            // Step 5.1: Add structured logging context (MDC)
+
+            MDC.put("tenantSlug", slug);
+            MDC.put("userId",     userId);
+            MDC.put("requestId",  UUID.randomUUID().toString());
+
+
+
             String normalizedRole = role.toUpperCase();
 
             // Step 6: Set Spring SecurityContext
@@ -89,6 +99,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
+
+
+
             // Step 7: Continue filter chain
             filterChain.doFilter(request, response);
 
@@ -98,6 +111,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             // VERY IMPORTANT → prevent thread leakage
             TenantContext.clear();
+
+            // VERY IMPORTANT → prevent MDC leakage between requests
+            MDC.clear();
         }
     }
 

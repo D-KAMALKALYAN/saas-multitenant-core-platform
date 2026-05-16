@@ -8,6 +8,10 @@ spring:
     enabled: true
 
 logging:
+
+  pattern:
+    console: '{"time":"%d","level":"%level","tenant":"%X{tenantSlug}","req":"%X{requestId}","user":"%X{userId}","msg":"%msg"}%n'
+
   level:
     root: WARN
     com.saasplatform: INFO

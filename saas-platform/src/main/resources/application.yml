@@ -1,16 +1,17 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   application:
     name: saas-platform
+
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/saas_platform}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:kamal@PSQL1}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -33,15 +34,15 @@ spring:
 
 app:
   security:
-    bcrypt-strength: 10
+    bcrypt-strength: ${BCRYPT_STRENGTH:10}
 
   jwt:
-    secret: ${JWT_SECRET:87be8d19b767e23b8bae50fe657b8cd240e7cb167caf36814d9f4c4d61693a63}
-    access-token-expiry: 3600000
-    refresh-token-expiry: 2592000000
+    secret: ${JWT_SECRET}
+    access-token-expiry: ${JWT_ACCESS_EXPIRY:3600000}
+    refresh-token-expiry: ${JWT_REFRESH_EXPIRY:2592000000}
 
   rate-limit:
       plans:
-        basic: 100
-        pro: 500
-        enterprise: 2000
+        basic: ${RATE_LIMIT_BASIC:100}
+        pro: ${RATE_LIMIT_PRO:500}
+        enterprise:  ${RATE_LIMIT_ENTERPRISE:2000}
