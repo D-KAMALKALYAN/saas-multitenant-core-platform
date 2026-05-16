@@ -22,3 +22,9 @@ springdoc:
     enabled: false
   api-docs:
     enabled: false
+
+
+management:
+  endpoint:
+    health:
+      show-details: never

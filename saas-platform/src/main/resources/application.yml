@@ -1,3 +1,18 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, flyway, prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    app:
+      name: SaaS Multi-Tenant Platform
+      version: 1.0.0
+      description: Production-grade multi-tenant SaaS infrastructure
+
 server:
   port: ${SERVER_PORT:8080}
 

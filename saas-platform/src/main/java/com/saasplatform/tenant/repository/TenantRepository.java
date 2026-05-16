@@ -25,4 +25,6 @@ public interface TenantRepository extends JpaRepository<Tenant , UUID> {
     Page<Tenant> findAllByDeletedAtIsNull(Pageable pageable);
 
     boolean existsByEmailAndIdNot(String email, UUID id);
+
+    long countByDeletedAtIsNull();
 }

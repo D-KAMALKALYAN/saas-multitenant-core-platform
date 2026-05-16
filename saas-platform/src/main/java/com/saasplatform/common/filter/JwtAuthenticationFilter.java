@@ -85,8 +85,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             MDC.put("userId",     userId);
             MDC.put("requestId",  UUID.randomUUID().toString());
 
-
-
             String normalizedRole = role.toUpperCase();
 
             // Step 6: Set Spring SecurityContext
