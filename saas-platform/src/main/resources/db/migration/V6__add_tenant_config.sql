@@ -1,5 +1,5 @@
--- V3__add_tenant_config.sql
-CREATE TABLE tenant_configs (
+-- V6__add_tenant_config.sql
+CREATE TABLE IF NOT EXISTS tenant_configs (
                                 id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                 tenant_id   UUID NOT NULL REFERENCES tenants(id),
                                 config_key  VARCHAR(100) NOT NULL,
@@ -9,5 +9,5 @@ CREATE TABLE tenant_configs (
                                 UNIQUE (tenant_id, config_key)
 );
 
-CREATE INDEX idx_tenant_configs_tenant_id
+CREATE INDEX IF NOT EXISTS idx_tenant_configs_tenant_id
     ON tenant_configs(tenant_id);

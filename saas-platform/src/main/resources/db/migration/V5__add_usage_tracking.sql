@@ -1,4 +1,4 @@
--- V4__add_usage_tracking.sql
+-- V5__add_usage_tracking.sql
 CREATE TABLE usage_records (
                                id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                tenant_id   UUID NOT NULL REFERENCES tenants(id),
