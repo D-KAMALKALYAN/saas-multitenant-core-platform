@@ -3,6 +3,7 @@ package com.saasplatform.usage.controller;
 
 
 import com.saasplatform.common.response.StandardApiResponse;
+import com.saasplatform.usage.dto.UsageResponse;
 import com.saasplatform.usage.service.UsageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,7 +21,7 @@ public class UsageController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    public StandardApiResponse<?> getUsage(
+    public StandardApiResponse<UsageResponse> getUsage(
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate from,

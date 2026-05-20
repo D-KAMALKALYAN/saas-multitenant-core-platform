@@ -3,9 +3,11 @@ package com.saasplatform.usage.service;
 
 import com.saasplatform.common.context.TenantContext;
 import com.saasplatform.common.response.StandardApiResponse;
+import com.saasplatform.usage.dto.UsageResponse;
 import com.saasplatform.usage.entity.UsageRecord;
 import com.saasplatform.usage.repository.UsageRecordRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsageService {
@@ -28,15 +33,35 @@ public class UsageService {
             String method
     ) {
 
-        usageRecordRepository.upsertCount(
-                tenantId,
-                LocalDate.now(),
-                endpoint,
-                method
-        );
+        try {
+
+            usageRecordRepository.upsertCount(
+                    tenantId,
+                    LocalDate.now(),
+                    endpoint,
+                    method
+            );
+
+            log.debug(
+                    "Usage tracked successfully -> tenant={} endpoint={} method={}",
+                    tenantId,
+                    endpoint,
+                    method
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to track usage -> tenant={} endpoint={} method={}",
+                    tenantId,
+                    endpoint,
+                    method,
+                    ex
+            );
+        }
     }
 
-    public StandardApiResponse<?> getUsage(
+    public StandardApiResponse<List<UsageResponse>> getUsage(
             LocalDate from,
             LocalDate to
     ) {
@@ -51,29 +76,46 @@ public class UsageService {
                         a.getAuthority()
                                 .equals("ROLE_SUPER_ADMIN"));
 
+        List<UsageRecord> records;
+
         if (isSuperAdmin) {
 
-            List<UsageRecord> all = usageRecordRepository
+            records = usageRecordRepository
                     .findByRecordDateBetween(from, to);
 
-            return StandardApiResponse.success(
-                    "Usage fetched successfully",
-                    all
-            );
+        } else {
+
+            UUID tenantId = TenantContext.getTenantId();
+
+            records = usageRecordRepository
+                    .findByTenantIdAndRecordDateBetween(
+                            tenantId,
+                            from,
+                            to
+                    );
         }
 
-        UUID tenantId = TenantContext.getTenantId();
-
-        List<UsageRecord> tenantUsage = usageRecordRepository
-                .findByTenantIdAndRecordDateBetween(
-                        tenantId,
-                        from,
-                        to
-                );
+        List<UsageResponse> response = records.stream()
+                .map(this::mapToResponse)
+                .toList();
 
         return StandardApiResponse.success(
                 "Usage fetched successfully",
-                tenantUsage
+                response
         );
+    }
+
+
+    private UsageResponse mapToResponse(
+            UsageRecord record
+    ) {
+
+        return UsageResponse.builder()
+                .tenantId(record.getTenantId())
+                .recordDate(record.getRecordDate())
+                .endpoint(record.getEndpoint())
+                .method(record.getMethod())
+                .requestCount(record.getRequestCount())
+                .build();
     }
 }
