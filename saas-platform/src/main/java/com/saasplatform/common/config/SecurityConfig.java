@@ -2,12 +2,14 @@ package com.saasplatform.common.config;
 
 
 import com.saasplatform.common.filter.ApiKeyAuthenticationFilter;
+import com.saasplatform.common.filter.CorrelationIdFilter;
 import com.saasplatform.common.filter.JwtAuthenticationFilter;
 import com.saasplatform.common.filter.UsageTrackingFilter;
 import com.saasplatform.ratelimit.filter.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,6 +29,7 @@ public class SecurityConfig {
     private final RateLimitFilter rateLimitFilter;
     private final ApiKeyAuthenticationFilter apiKeyFilter;
     private final UsageTrackingFilter usageTrackingFilter;
+    private final CorrelationIdFilter correlationIdFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -38,6 +41,20 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                .headers(headers -> headers
+
+                        .frameOptions(frame ->
+                                frame.deny()
+                        )
+
+                        .contentTypeOptions(Customizer.withDefaults())
+
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)
+                        )
                 )
 
                 .authorizeHttpRequests(auth -> auth
@@ -61,6 +78,8 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class)
+
+                .addFilterBefore(correlationIdFilter, JwtAuthenticationFilter.class)
 
                 .addFilterAfter(usageTrackingFilter,
                     RateLimitFilter.class

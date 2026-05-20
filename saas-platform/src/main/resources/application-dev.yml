@@ -13,7 +13,7 @@ spring:
 logging:
 
   pattern:
-    console: "%d{HH:mm:ss} %-5level [%X{tenantSlug}] [%X{requestId}] %logger{20} - %msg%n"
+    console: "%d{HH:mm:ss} %-5level [%X{tenantSlug}] [%X{correlationId}] [%X{requestId}] %logger{20} - %msg%n"
 
   level:
     com.saasplatform: DEBUG
