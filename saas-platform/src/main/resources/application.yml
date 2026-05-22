@@ -23,6 +23,11 @@ spring:
       connection-timeout: 20000
       idle-timeout: 300000
       max-lifetime: 1200000
+      leak-detection-threshold: 60000
+
+      data-source-properties:
+        socketTimeout: 30
+        connection-init-sql: "SET statement_timeout = '30s'"
 
   jpa:
     open-in-view: false
