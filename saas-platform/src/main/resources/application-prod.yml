@@ -3,6 +3,11 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
 
   flyway:
     enabled: true
