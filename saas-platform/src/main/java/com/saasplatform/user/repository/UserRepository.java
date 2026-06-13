@@ -1,5 +1,6 @@
 package com.saasplatform.user.repository;
 
+import com.saasplatform.user.entity.RoleType;
 import com.saasplatform.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmailAndTenantIdAndDeletedAtIsNull(String email , UUID tenantId);
 
     Optional<User> findByIdAndDeletedAtIsNull(UUID id);
+
+    boolean existsByRole(RoleType roleType);
 }

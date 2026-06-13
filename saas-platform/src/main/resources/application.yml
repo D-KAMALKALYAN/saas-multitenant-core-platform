@@ -82,7 +82,6 @@ app:
 
   jwt:
     secret: ${JWT_SECRET}
-
     access-token-expiry: ${JWT_ACCESS_EXPIRY:3600000}
     refresh-token-expiry: ${JWT_REFRESH_EXPIRY:2592000000}
 
@@ -91,3 +90,8 @@ app:
       basic: ${RATE_LIMIT_BASIC:100}
       pro: ${RATE_LIMIT_PRO:500}
       enterprise: ${RATE_LIMIT_ENTERPRISE:2000}
+
+  bootstrap:
+    enabled: ${BOOTSTRAP_ENABLED:true}
+    admin-email: ${BOOTSTRAP_ADMIN_EMAIL:admin@platform.internal}
+    admin-password: ${BOOTSTRAP_ADMIN_PASSWORD}
