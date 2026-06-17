@@ -7,13 +7,15 @@ import com.saasplatform.user.entity.StatusType;
 import com.saasplatform.user.entity.User;
 import com.saasplatform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -27,22 +29,30 @@ public class BootstrapService {
     @Value("${app.bootstrap.admin-email:admin@platform.internal}")
     private String adminEmail;
 
-    @Value("${app.bootstrap.admin-password}")
+    @Value("${app.bootstrap.admin-password:}")
     private String adminPassword;
 
-    @Value("${app.bootstrap.enabled:true}")
+    @Value("${app.bootstrap.enabled:false}")
     private boolean bootstrapEnabled;
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void bootstrap() {
+
         if (!bootstrapEnabled) {
             log.info("Bootstrap disabled via configuration");
             return;
         }
 
-        boolean superAdminExists = userRepository
-                .existsByRole(RoleType.SUPER_ADMIN);
+        if (!StringUtils.hasText(adminPassword)) {
+            throw new IllegalStateException(
+                    "BOOTSTRAP_ADMIN_PASSWORD must be configured when bootstrap is enabled"
+            );
+        }
+
+        boolean superAdminExists = userRepository.existsByRole(
+                RoleType.SUPER_ADMIN
+        );
 
         if (superAdminExists) {
             log.info("SUPER_ADMIN already exists — skipping bootstrap");
@@ -51,10 +61,39 @@ public class BootstrapService {
 
         log.warn("No SUPER_ADMIN found — running bootstrap");
 
+        try {
+
+            createSuperAdmin();
+
+            log.warn(
+                    "Bootstrap complete — SUPER_ADMIN created: {}",
+                    adminEmail
+            );
+
+            log.warn(
+                    "Change the admin password immediately after first login"
+            );
+
+        } catch (DataIntegrityViolationException ex) {
+
+            // Multiple application instances may start simultaneously.
+            // Another instance successfully created the SUPER_ADMIN first.
+
+            log.info(
+                    "SUPER_ADMIN created by another instance concurrently — bootstrap skipped safely"
+            );
+        }
+    }
+
+    private void createSuperAdmin() {
+
         Tenant platformTenant = tenantRepository
                 .findBySlugAndDeletedAtIsNull("platform")
-                .orElseThrow(() -> new IllegalStateException(
-                        "Platform tenant missing — V7 migration may not have run"));
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Platform tenant missing — Flyway migration may not have run"
+                        )
+                );
 
         User superAdmin = User.builder()
                 .tenantId(platformTenant.getId())
@@ -67,9 +106,5 @@ public class BootstrapService {
                 .build();
 
         userRepository.save(superAdmin);
-
-        log.warn("Bootstrap complete — SUPER_ADMIN created: {}", adminEmail);
-        log.warn("Change the admin password immediately after first login");
     }
-
 }
