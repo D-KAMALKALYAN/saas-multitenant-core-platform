@@ -28,6 +28,7 @@ springdoc:
   api-docs:
     enabled: false
 
+app:
   bootstrap:
     enabled: ${BOOTSTRAP_ENABLED:true}
     admin-email: ${BOOTSTRAP_ADMIN_EMAIL:admin@platform.internal}

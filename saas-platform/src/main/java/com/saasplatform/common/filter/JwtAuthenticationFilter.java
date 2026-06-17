@@ -96,8 +96,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             MDC.put("userId",     userId);
             MDC.put("requestId",  UUID.randomUUID().toString());
 
-
-
             // Step 6: Set Spring SecurityContext
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
@@ -107,9 +105,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
-
-
-
 
             // Step 7: Continue filter chain
             filterChain.doFilter(request, response);
