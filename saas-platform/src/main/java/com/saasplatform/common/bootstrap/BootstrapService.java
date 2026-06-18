@@ -29,10 +29,10 @@ public class BootstrapService {
     @Value("${app.bootstrap.admin-email:admin@platform.internal}")
     private String adminEmail;
 
-    @Value("${app.bootstrap.admin-password:}")
+    @Value("${app.bootstrap.admin-password}")
     private String adminPassword;
 
-    @Value("${app.bootstrap.enabled:false}")
+    @Value("${app.bootstrap.enabled:true}")
     private boolean bootstrapEnabled;
 
     @EventListener(ApplicationReadyEvent.class)
