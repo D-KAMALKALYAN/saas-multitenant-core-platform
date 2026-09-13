@@ -35,3 +35,8 @@ build/
 
 .env
 .dockerignore
+
+### Local knowledge base — NEVER commit (personal learning/interview notes) ###
+.claude/
+interview-preparation/
+interviewprep/
