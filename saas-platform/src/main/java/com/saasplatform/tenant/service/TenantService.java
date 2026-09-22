@@ -5,6 +5,7 @@ import com.saasplatform.audit.entity.AuditAction;
 import com.saasplatform.common.exception.TenantAlreadyExistsException;
 import com.saasplatform.common.exception.TenantNotFoundException;
 import com.saasplatform.common.response.StandardApiResponse;
+import com.saasplatform.tenant.entity.PlanType;
 import com.saasplatform.tenant.mapper.TenantMapper;
 import com.saasplatform.tenant.dto.TenantRequest;
 import com.saasplatform.tenant.dto.TenantResponse;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -61,7 +63,8 @@ public class TenantService {
             savedTenant.setSlug(request.getSlug());
 
             //System Controlled fields
-            savedTenant.setPlan(request.getPlan());
+            savedTenant.setPlan(Optional.ofNullable(request.getPlan())
+                    .orElse(PlanType.BASIC));
             savedTenant.setStatus(StatusType.ACTIVE);
 
             //Save
