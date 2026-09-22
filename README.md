@@ -268,8 +268,6 @@ Real defects found by reviewing this code, kept here rather than in a private no
 - **No cross-tenant isolation test.** The property this entire project exists to guarantee is the one property with no test.
 - **`prometheus` is listed in the Actuator exposure list, but `micrometer-registry-prometheus` is not a dependency**, so that endpoint does not exist.
 - **Version drift.** `pom.xml` targets Java 17 while CI and the Dockerfile use 21; the older module-level `saas-platform/README.md` claims Java 21 / PostgreSQL 18 and describes a filter order that double registration does not guarantee.
-- **The CI workflow is duplicated**, once at the repository root (live) and once under `saas-platform/.github/workflows/` (inert). Two copies of the same pipeline will drift.
-- `V3__future_feature.sql` is an empty placeholder migration, and `src/test/resources/application-test.yml` hardcodes a local database password instead of reading the environment.
 
 ## What isn't built yet
 
